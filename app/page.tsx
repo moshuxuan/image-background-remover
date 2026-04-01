@@ -46,7 +46,7 @@ export default function Home() {
           <p className="text-gray-600">快速、免费、无需注册</p>
         </header>
 
-        {!image ? (
+{!image ? (
           <div className="max-w-2xl mx-auto">
             <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -60,32 +60,34 @@ export default function Home() {
             </label>
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-white p-4 rounded-lg shadow">
-                <h3 className="text-sm font-semibold mb-2 text-gray-700">原图</h3>
-                <img src={image} alt="原图" className="w-full rounded" />
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">原图</h3>
+                <div className="flex items-center justify-center min-h-[300px]">
+                  <img src={image} alt="原图" className="max-w-full max-h-[400px] object-contain rounded-lg" />
+                </div>
               </div>
               {result && (
-                <div className="bg-white p-4 rounded-lg shadow">
-                  <h3 className="text-sm font-semibold mb-2 text-gray-700">处理后</h3>
-                  <div className="relative" style={{backgroundImage: 'repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 50% / 20px 20px'}}>
-                    <img src={result} alt="处理后" className="w-full rounded" />
+                <div className="bg-white p-6 rounded-xl shadow-lg">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">处理后</h3>
+                  <div className="flex items-center justify-center min-h-[300px]" style={{backgroundImage: 'repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 50% / 20px 20px'}}>
+                    <img src={result} alt="处理后" className="max-w-full max-h-[400px] object-contain rounded-lg" />
                   </div>
                 </div>
               )}
             </div>
             <div className="flex justify-center gap-4">
               {!result ? (
-                <button onClick={handleRemoveBg} disabled={loading} className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+                <button onClick={handleRemoveBg} disabled={loading} className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors">
                   {loading ? '处理中...' : '去除背景'}
                 </button>
               ) : (
                 <>
-                  <a href={result} download="removed-bg.png" className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                  <a href={result} download="removed-bg.png" className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                     下载图片
                   </a>
-                  <button onClick={handleReset} className="px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                  <button onClick={handleReset} className="px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
                     重新上传
                   </button>
                 </>
