@@ -43,7 +43,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">🖼️ 图片背景去除</h1>
-          <p className="text-gray-600">快速、免费、无需注册</p>
+          <p className="text-gray-600">快速、无需注册</p>
         </header>
 
 {!image ? (
