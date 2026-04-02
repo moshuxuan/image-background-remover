@@ -1,36 +1,5 @@
 {
   "name": "image-background-remover",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/moshuxuan/image-background-remover.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/moshuxuan/image-background-remover/issues"
-  },
-  "homepage": "https://github.com/moshuxuan/image-background-remover#readme",
-  "dependencies": {
-    "@types/node": "^25.5.0",
-    "@types/react": "^19.2.14",
-    "next": "^16.2.1",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "typescript": "^5.9.3"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.2",
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.2"
-  }
+  "description": "纯前端图片背景去除工具"
 }

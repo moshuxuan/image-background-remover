@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片背景去除</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { text-align: center; color: #333; margin-bottom: 10px; font-size: 28px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+        .upload-area:hover { border-color: #764ba2; background: #f0f2ff; }
+        .upload-area.dragover { border-color: #764ba2; background: #e8ebff; }
+        input[type="file"] { display: none; }
+        .upload-icon { font-size: 48px; margin-bottom: 15px; }
+        .upload-text { color: #666; font-size: 16px; }
+        .preview-area { display: none; margin-top: 30px; }
+        .preview-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .preview-box { text-align: center; }
+        .preview-box h3 { margin-bottom: 10px; color: #555; font-size: 14px; }
+        .preview-box img, .preview-box canvas {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .preview-box canvas {
+            background: linear-gradient(45deg, #ccc 25%, transparent 25%),
+                        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #ccc 75%),
+                        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        .buttons { display: flex; gap: 15px; justify-content: center; }
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .btn-download { background: #667eea; color: white; }
+        .btn-download:hover { background: #5568d3; transform: translateY(-2px); }
+        .btn-reset { background: #e0e0e0; color: #333; }
+        .btn-reset:hover { background: #d0d0d0; }
+        .loading { display: none; text-align: center; margin-top: 20px; color: #667eea; font-size: 16px; }
+        @media (max-width: 768px) {
+            .preview-container { grid-template-columns: 1fr; }
+            .container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ 图片背景去除</h1>
+        <p class="subtitle">快速、无需注册</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">点击或拖拽图片到这里</div>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="loading" id="loading">⏳ 正在处理...</div>
+
+        <div class="preview-area" id="previewArea">
+            <div class="preview-container">
+                <div class="preview-box">
+                    <h3>原图</h3>
+                    <img id="originalImg" alt="原图">
+                </div>
+                <div class="preview-box">
+                    <h3>去除背景后</h3>
+                    <canvas id="resultCanvas"></canvas>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn-download" id="downloadBtn">💾 下载图片</button>
+                <button class="btn-reset" id="resetBtn">🔄 重新上传</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/index.umd.min.js"></script>
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const previewArea = document.getElementById('previewArea');
+        const originalImg = document.getElementById('originalImg');
+        const resultCanvas = document.getElementById('resultCanvas');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) processImage(file);
+        });
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processImage(file);
+        });
+
+        async function processImage(file) {
+            uploadArea.style.display = 'none';
+            loading.style.display = 'block';
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                originalImg.src = e.target.result;
+                try {
+                    const blob = await removeBackground(e.target.result);
+                    const img = new Image();
+                    img.onload = () => {
+                        resultCanvas.width = img.width;
+                        resultCanvas.height = img.height;
+                        resultCanvas.getContext('2d').drawImage(img, 0, 0);
+                        loading.style.display = 'none';
+                        previewArea.style.display = 'block';
+                    };
+                    img.src = URL.createObjectURL(blob);
+                } catch (error) {
+                    alert('处理失败: ' + error.message);
+                    reset();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            resultCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'removed-bg.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        });
+
+        resetBtn.addEventListener('click', reset);
+
+        function reset() {
+            uploadArea.style.display = 'block';
+            loading.style.display = 'none';
+            previewArea.style.display = 'none';
+            fileInput.value = '';
+        }
+    </script>
+</body>
+</html>
