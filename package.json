@@ -1,5 +1,8 @@
 {
   "name": "image-background-remover",
   "version": "1.0.0",
-  "description": "纯前端图片背景去除工具"
+  "description": "纯前端图片背景去除工具",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  }
 }
